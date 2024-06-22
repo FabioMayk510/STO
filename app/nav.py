@@ -25,6 +25,7 @@ class Produtos:
 class Browser:
     def __init__(self):
         options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
         self.brs = webdriver.Chrome(service=service, options=options)
         self.brs.get("https://mercadolivre.com.br")
         self.brs.maximize_window()
