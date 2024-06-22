@@ -1,0 +1,64 @@
+<!-- resultados.html -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ p }}</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .back-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Preço médio do produto '{{ p }}': R$ {{ media }}</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Vendedor</th>
+                <th>Avaliação</th>
+                <th>Qtd Avaliações</th>
+                <th>Preço</th>
+                <th>Parcela</th>
+                <th>Desconto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produto in produtos %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ produto.nome }}</td>
+                <td>{{ produto.vendedor }}</td>
+                <td>{{ produto.avaliacao }}</td>
+                <td>{{ produto.qtdavaliacao }}</td>
+                <td>{{ produto.valor }}</td>
+                <td>{{ produto.parcela }}</td>
+                <td>{{ produto.desconto }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="javascript:history.back()" class="back-button">Voltar</a>
+</body>
+</html>
