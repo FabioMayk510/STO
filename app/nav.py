@@ -33,7 +33,7 @@ class Browser:
             self.brs.get("https://mercadolivre.com.br")
             self.brs.maximize_window()
         except SessionNotCreatedException:
-            __init__(self)
+            self.__init__(self)
 
     
     def calcular_media(self, valores):
@@ -53,16 +53,16 @@ class Browser:
         while qtd > 0:
             for i in range(idx, qtd + 1):
                 try:
+                    self.brs.find_element(By.XPATH, "//button[contains(@class, 'cookie-consent-banner-opt-out__action cookie-consent-banner-opt-out__action--primary cookie-consent-banner-opt-out__action--key-accept')]").click()
+                except NoSuchElementException:
+                    pass
+                try:
                     xnome = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div//div//div[2]//div[contains(@class, 'ui-search-item__group--title')]//a//h2"
                     nome = self.brs.find_element(By.XPATH, xnome).text
                 except NoSuchElementException:
                     try:
-                        try:
-                            self.brs.find_element(By.XPATH, "//button[contains(@class, 'cookie-consent-banner-opt-out__action cookie-consent-banner-opt-out__action--primary cookie-consent-banner-opt-out__action--key-accept')]").click()
-                        except NoSuchElementException:
-                            pass
                         xseguinte = "//li[contains(@class, 'andes-pagination__button andes-pagination__button--next')]//a"
-                        print(self.brs.find_element(By.XPATH, xseguinte).click())
+                        self.brs.find_element(By.XPATH, xseguinte).click()
                         idx = 1
                         break  
                     except NoSuchElementException:
@@ -100,9 +100,9 @@ class Browser:
                 except NoSuchElementException:
                     valor = preco
                     cents = ""
-                valor.replace(".", "").replace(",", ".")
+                valorCorrigido = valor.replace(".", "").replace(",", ".")
 
-                media.append(float(valor))
+                media.append(float(valorCorrigido))
 
                 xmulti = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-item__group__element ui-search-installments')]"
                 try:
