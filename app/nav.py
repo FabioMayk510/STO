@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import SessionNotCreatedException
 from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
@@ -24,15 +25,16 @@ class Produtos:
 
 class Browser:
     def __init__(self):
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        self.brs = webdriver.Chrome(service=service, options=options)
-        self.brs.get("https://mercadolivre.com.br")
-        self.brs.maximize_window()
+        try:
+            options = webdriver.ChromeOptions()
+            # options.add_argument('--headless')
+            options.add_argument('--disable-extensions')
+            self.brs = webdriver.Chrome(service=service, options=options)
+            self.brs.get("https://mercadolivre.com.br")
+            self.brs.maximize_window()
+        except SessionNotCreatedException:
+            __init__(self)
 
-    def regexValor(self, multi):
-        m = re.search(r'(\d+)x', multi).group(1)
-        return m
     
     def calcular_media(self, valores):
         if len(valores) == 0:
@@ -46,60 +48,80 @@ class Browser:
 
         produtos = []
         media = []
+        idx = 1
 
-        for i in range(1, qtd + 1):
+        while qtd > 0:
+            for i in range(idx, qtd + 1):
+                try:
+                    xnome = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div//div//div[2]//div[contains(@class, 'ui-search-item__group--title')]//a//h2"
+                    nome = self.brs.find_element(By.XPATH, xnome).text
+                except NoSuchElementException:
+                    try:
+                        try:
+                            self.brs.find_element(By.XPATH, "//button[contains(@class, 'cookie-consent-banner-opt-out__action cookie-consent-banner-opt-out__action--primary cookie-consent-banner-opt-out__action--key-accept')]").click()
+                        except NoSuchElementException:
+                            pass
+                        xseguinte = "//li[contains(@class, 'andes-pagination__button andes-pagination__button--next')]//a"
+                        print(self.brs.find_element(By.XPATH, xseguinte).click())
+                        idx = 1
+                        break  
+                    except NoSuchElementException:
+                        print('Não há mais produtos')
+                        return produtos, self.calcular_media(media)
 
-            xnome = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div//div//div[2]//div[contains(@class, 'ui-search-item__group--title')]//a//h2"
-            nome = self.brs.find_element(By.XPATH, xnome).text
+                xvendedor = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div//div//div[2]//div[contains(@class, 'ui-search-item__group--title')]//p[contains(@class, 'ui-search-official-store-label')]"
+                try: 
+                    vendedor = self.brs.find_element(By.XPATH, xvendedor).text[4:]
+                except NoSuchElementException:
+                    vendedor = ""
+                
+                xavaliacao = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-reviews__rating-number')]"
+                try:
+                    avaliacao = self.brs.find_element(By.XPATH, xavaliacao).text
+                except NoSuchElementException:
+                    avaliacao = ""
 
-            xvendedor = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div//div//div[2]//div[contains(@class, 'ui-search-item__group--title')]//p[contains(@class, 'ui-search-official-store-label')]"
-            try: 
-                vendedor = self.brs.find_element(By.XPATH, xvendedor).text[4:]
-            except NoSuchElementException:
-                vendedor = ""
-            
-            xavaliacao = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-reviews__rating-number')]"
-            try:
-                avaliacao = self.brs.find_element(By.XPATH, xavaliacao).text
-            except NoSuchElementException:
-                avaliacao = ""
+                xqtdavaliacao = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-reviews__amount')]"
+                try:
+                    qtdavaliacao = self.brs.find_element(By.XPATH, xqtdavaliacao).text[1:-1]
+                except NoSuchElementException:
+                    qtdavaliacao = ""
+                
+                xpreco = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div[contains(@class, 'ui-search-item__group--price ui-search-item__group--price-grid-container')]//span[contains(@class, 'andes-money-amount--cents-superscript')]//span[contains(@class, 'andes-money-amount__fraction')]"
+                xcents = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div[contains(@class, 'ui-search-item__group--price ui-search-item__group--price-grid-container')]//span[contains(@class, 'andes-money-amount__cents--superscript-24')]"
+                try:
+                    preco = self.brs.find_element(By.XPATH, xpreco).text
+                except NoSuchElementException:
+                    preco = ""
+                
+                try:
+                    cents = self.brs.find_element(By.XPATH, xcents).text
+                    valor = preco + "," + cents
+                except NoSuchElementException:
+                    valor = preco
+                    cents = ""
+                valor.replace(".", "").replace(",", ".")
 
-            xqtdavaliacao = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-reviews__amount')]"
-            try:
-                qtdavaliacao = self.brs.find_element(By.XPATH, xqtdavaliacao).text[1:-1]
-            except NoSuchElementException:
-                qtdavaliacao = ""
-            
-            xpreco = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div[contains(@class, 'ui-search-item__group--price ui-search-item__group--price-grid-container')]//span[contains(@class, 'andes-money-amount--cents-superscript')]//span[contains(@class, 'andes-money-amount__fraction')]"
-            xcents = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//div[contains(@class, 'ui-search-item__group--price ui-search-item__group--price-grid-container')]//span[contains(@class, 'andes-money-amount__cents--superscript-24')]"
-            try:
-                preco = self.brs.find_element(By.XPATH, xpreco).text
-            except NoSuchElementException:
-                preco = ""
-            
-            try:
-                cents = self.brs.find_element(By.XPATH, xcents).text
-                valor = preco + "," + cents
-            except NoSuchElementException:
-                valor = preco
-                cents = ""
+                media.append(float(valor))
 
-            media.append(float(valor.replace(".", "").replace(",", ".")))
+                xmulti = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-item__group__element ui-search-installments')]"
+                try:
+                    parcelado = self.brs.find_element(By.XPATH, xmulti).text.replace("\n", " ").replace(" , ", ",")
+                except:
+                    parcelado = ""
 
-            xmulti = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//span[contains(@class, 'ui-search-item__group__element ui-search-installments')]"
-            try:
-                parcelado = self.brs.find_element(By.XPATH, xmulti).text.replace("\n", " ").replace(" , ", ",")
-            except:
-                parcelado = ""
+                xdesconto = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//p[contains(@class, 'coupon')]"
+                try:
+                    desconto = self.brs.find_element(By.XPATH, xdesconto).text[6:]
+                except NoSuchElementException:
+                    desconto = ""
 
-            xdesconto = f"//div[contains(@class, 'ui-search-main') and contains(@class, 'ui-search-main--only-products')]//section//ol//li[contains(@class, 'ui-search-layout__item') and not(contains(@class, 'ui-search-layout__item--intervention'))][{i}]//p[contains(@class, 'coupon')]"
-            try:
-                desconto = self.brs.find_element(By.XPATH, xdesconto).text[6:]
-            except NoSuchElementException:
-                desconto = ""     
+                produtoEncontrado = Produtos(nome, vendedor, avaliacao, qtdavaliacao, valor, parcelado, desconto)
+                produtos.append(produtoEncontrado)
 
-            produtoEncontrado = Produtos(nome, vendedor, avaliacao, qtdavaliacao, valor, parcelado, desconto)
-            produtos.append(produtoEncontrado)
+                qtd -= 1
+                if qtd <= 0:
+                    break
 
         data = DatabaseProdutos()
         for produto in produtos:
