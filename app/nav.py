@@ -6,6 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import SessionNotCreatedException
+from selenium.common.exceptions import ElementNotInteractableException
 from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
@@ -65,7 +66,7 @@ class Browser:
                         self.brs.find_element(By.XPATH, xseguinte).click()
                         idx = 1
                         break  
-                    except NoSuchElementException:
+                    except ElementNotInteractableException:
                         print('Não há mais produtos')
                         return produtos, self.calcular_media(media)
 

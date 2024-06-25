@@ -82,11 +82,13 @@ html{
 }
 
 h1{
+    color: rgba(11, 0, 105, 1);
     font-size: 3em;
 }
 
 table {
     font-size: 1.5em;
+    color: rgba(11, 0, 105, 1);
     width: 100%;
     border-collapse: collapse;
 }
@@ -98,7 +100,7 @@ th, td {
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #eeff00;
 }
 
 .voltar{
@@ -114,6 +116,7 @@ th {
     top: 50%;
     background-color: #eeff00;
     cursor: pointer;
+    user-select: none;
 }
 
 .back-button {
