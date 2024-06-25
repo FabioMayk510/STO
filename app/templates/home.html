@@ -1,20 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>Home</title>
 </head>
 <body>
-    <form action="/search" method="post">
-        <label class="item-pesquisavel">
-            Escolha o que pesquisar:
-            <input type="text" name="produto" placeholder="Ex: Chuveiro..." required>
-        </label>
-        <label class="qtd-item">
-            <input type="number" name="qtd" placeholder="Quantidade..." required>
-        </label>
-        <input type="submit" value="Buscar">
-    </form>    
+    <div id="body">
+        <form action="/search" method="post" class="formPesquisa">
+            <label class="item-pesquisavel">
+                Bem vindo
+            </label>
+                <input type="text" name="produto" placeholder="Ex: Chuveiro..." required>
+                <input type="number" name="qtd" placeholder="Quantidade..." required>
+            <input type="submit" id="buscar" value="Buscar">
+            <img src="../static/ML.png" alt="mercado livre" class="ml">
+            <img src="../static/FIS.png" alt="fis" class="fis">
+        </form>    
+    </div>
+    <script>
+        const form = document.querySelector('.formPesquisa');
+        const label = form.querySelector('.item-pesquisavel');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.style.display = 'none';
+            });
+
+            label.textContent = 'Carregando resultados...';
+
+            const imgs = form.querySelectorAll('img');
+            imgs.forEach(img => {
+                img.style.visibility = 'visible';
+            });
+
+            axios.post('/search', new FormData(form))
+                .then(response => {
+                    document.body.innerHTML = response.data;
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar formulário:', error);
+                });
+        });
+    </script>
 </body>
 </html>

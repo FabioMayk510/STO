@@ -1,0 +1,151 @@
+*{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html{
+    font-size: 10px;
+}
+
+#body{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+}
+
+.formPesquisa{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    width: 60vh;
+    height: 80vh;
+    padding: 1vh;
+    background-color: #eeff00;
+    justify-content: center;
+    align-items: center;
+    border-radius: 2vh;
+    font-size: 3rem;
+}
+
+.formPesquisa > input[type=text]{
+    margin-top: 20%;    
+}
+
+.formPesquisa > input:not([type=submit]){
+    font-size: 2.5rem;
+    border-radius: 2vh;
+    border: none;
+    height: 6vh;
+    padding: 1vh;
+}
+
+.formPesquisa > input:not([type=submit])::placeholder{
+    font-size: 2rem;
+    text-align: center;
+}
+
+
+.formPesquisa > input[type=submit]{
+    font-size: 2.5rem;
+    padding-left: 7vh;
+    padding-right: 7vh;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    color: rgba(11, 0, 105, 1);
+    border-radius: 2vh;
+    border: none;
+}
+
+.item-pesquisavel{
+    position: absolute;
+    top: 25%;
+    color: rgba(11, 0, 105, 1);
+}
+
+.ml, .fis{
+    position: absolute;
+    width: 8vw;
+    height: 13vh;
+    border-radius: 3vw;
+    visibility: hidden;
+}
+
+.fis {
+    background-color: #eeff00;
+    animation: rotate1 3s linear infinite;
+}
+
+.ml {
+    z-index: 1;
+    animation: rotate2 3s linear infinite;
+}
+
+h1{
+    font-size: 3em;
+}
+
+table {
+    font-size: 1.5em;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.voltar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: fixed;
+    height: 10vh;
+    width: 10vh;
+    border-radius: 50%;
+    left: 0;
+    top: 50%;
+    background-color: #eeff00;
+    cursor: pointer;
+}
+
+.back-button {
+    font-size: 5em;
+    text-decoration: none;
+    color: rgba(11, 0, 105, 1);
+}
+
+@keyframes rotate1 {
+    0% {
+        z-index: 2;
+        transform: translatex(55%);
+    }
+    50%{
+        transform: translateX(-55%);
+    }
+    100% {
+        z-index: 1;
+        transform: translatex(55%);
+    }
+}
+
+@keyframes rotate2 {
+    0% {
+        z-index: 1;
+        transform: translateX(-55%);
+    }
+    50% {
+        transform: translatex(55%);
+    }
+    100% {
+        z-index: 2;
+        transform: translateX(-55%);
+    }
+}

@@ -27,7 +27,7 @@ class Browser:
     def __init__(self):
         try:
             options = webdriver.ChromeOptions()
-            # options.add_argument('--headless')
+            options.add_argument('--headless')
             options.add_argument('--disable-extensions')
             self.brs = webdriver.Chrome(service=service, options=options)
             self.brs.get("https://mercadolivre.com.br")
